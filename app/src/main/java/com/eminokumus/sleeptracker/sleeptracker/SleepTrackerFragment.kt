@@ -62,6 +62,16 @@ class SleepTrackerFragment : Fragment() {
 
         binding.lifecycleOwner = this
 
+        binding.startButton.setOnClickListener {
+            sleepTrackerViewModel.onStartTracking()
+        }
+        binding.stopButton.setOnClickListener {
+            sleepTrackerViewModel.onStopTracking()
+        }
+        binding.clearButton.setOnClickListener {
+            sleepTrackerViewModel.onClear()
+        }
+
         return binding.root
     }
 }
