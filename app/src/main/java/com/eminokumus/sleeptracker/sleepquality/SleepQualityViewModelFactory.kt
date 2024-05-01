@@ -14,4 +14,22 @@
  * limitations under the License.
  */
 
-package com.example.android.trackmysleepquality.sleepquality
+package com.eminokumus.sleeptracker.sleepquality
+
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.ViewModelProvider
+import com.eminokumus.sleeptracker.database.SleepDatabaseDao
+import com.eminokumus.sleeptracker.sleepquality.SleepQualityViewModel
+
+class SleepQualityViewModelFactory(
+    private val sleepNightKey: Long,
+    private val dataSource: SleepDatabaseDao
+) : ViewModelProvider.Factory {
+    @Suppress("unchecked_cast")
+    override fun <T : ViewModel> create(modelClass: Class<T>): T {
+        if (modelClass.isAssignableFrom(SleepQualityViewModel::class.java)) {
+            return SleepQualityViewModel(sleepNightKey, dataSource) as T
+        }
+        throw IllegalArgumentException("Unknown ViewModel class")
+    }
+}
