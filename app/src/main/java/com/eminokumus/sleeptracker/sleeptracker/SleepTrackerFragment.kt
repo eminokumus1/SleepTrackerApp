@@ -22,7 +22,9 @@ import android.view.View
 import android.view.ViewGroup
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
+import androidx.navigation.fragment.findNavController
 import com.eminokumus.sleeptracker.R
 import com.eminokumus.sleeptracker.database.SleepDatabase
 import com.eminokumus.sleeptracker.databinding.FragmentSleepTrackerBinding
@@ -71,6 +73,17 @@ class SleepTrackerFragment : Fragment() {
         binding.clearButton.setOnClickListener {
             sleepTrackerViewModel.onClear()
         }
+
+        sleepTrackerViewModel.navigateToSleepQuality.observe(viewLifecycleOwner, Observer { night ->
+            night?.let {
+                this.findNavController().navigate(
+                    SleepTrackerFragmentDirections.actionSleepTrackerFragmentToSleepQualityFragment(
+                        night.nightId
+                    )
+                )
+                sleepTrackerViewModel.doneNavigating()
+            }
+        })
 
         return binding.root
     }
