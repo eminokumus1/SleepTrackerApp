@@ -1,22 +1,18 @@
 package com.eminokumus.sleeptracker.sleeptracker
 
 import android.view.LayoutInflater
-import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
+import android.widget.Toast
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
-import androidx.recyclerview.widget.RecyclerView.ViewHolder
-import com.eminokumus.sleeptracker.R
-import com.eminokumus.sleeptracker.convertDurationToFormatted
-import com.eminokumus.sleeptracker.convertNumericQualityToString
 import com.eminokumus.sleeptracker.database.SleepNight
 import com.eminokumus.sleeptracker.databinding.ListItemSleepNightBinding
 
 class SleepNightAdapter :
     ListAdapter<SleepNight, SleepNightAdapter.ViewHolder>(SleepNightDiffCallback()) {
 
+        var sleepClickListener: SleepNightListener? = null
 
     class ViewHolder private constructor(var sleepNightBinding: ListItemSleepNightBinding) :
         RecyclerView.ViewHolder(sleepNightBinding.root) {
@@ -48,6 +44,15 @@ class SleepNightAdapter :
         val item = getItem(position)
         holder.bind(item)
 
+        holder.sleepNightBinding.root.setOnClickListener {
+            sleepClickListener?.onClick(item.nightId)
+        }
+
+
+
+    }
+    interface SleepNightListener{
+        fun onClick(sleepId: Long)
     }
 
 
@@ -63,4 +68,8 @@ class SleepNightDiffCallback : DiffUtil.ItemCallback<SleepNight>() {
     }
 
 }
+
+
+
+
 
