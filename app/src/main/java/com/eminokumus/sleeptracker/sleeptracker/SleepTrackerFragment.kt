@@ -65,7 +65,16 @@ class SleepTrackerFragment : Fragment() {
 
         binding.sleepTrackerViewModel = sleepTrackerViewModel
 
-        val manager = GridLayoutManager(activity,3)
+        val manager = GridLayoutManager(activity, 3)
+        manager.spanSizeLookup = object : GridLayoutManager.SpanSizeLookup(){
+            override fun getSpanSize(position: Int): Int {
+                return when(position){
+                    0 -> 3
+                    else -> 1
+                }
+            }
+
+        }
         binding.sleepList.layoutManager = manager
 
 
@@ -82,23 +91,34 @@ class SleepTrackerFragment : Fragment() {
         }
 
 
-
         val adapter = SleepNightAdapter().also {
-            it.sleepClickListener = object : SleepNightAdapter.SleepNightListener{
-                override fun onClick(sleepId: Long) {
-                    Toast.makeText(context,"$sleepId",Toast.LENGTH_SHORT).show()
+            it.sleepClickListener = object : SleepNightAdapter.SleepNightListener {
+                override fun onClick(nightId: Long) {
+                    sleepTrackerViewModel.onSleepNightClicked(nightId)
                 }
             }
         }
         binding.sleepList.adapter = adapter
 
-        sleepTrackerViewModel.nights.observe(viewLifecycleOwner,Observer{
-            it?.let {
-                adapter.submitList(it)
-            }
-        })
+        sleepTrackerViewModel.navigateToSleepDataQuality.observe(
+            viewLifecycleOwner,
+            Observer { night ->
+                night?.let {
+                    this.findNavController().navigate(
+                        SleepTrackerFragmentDirections.
+                        actionSleepTrackerFragmentToSleepDetailFragment(night)
+                    )
+                    sleepTrackerViewModel.onSleepDataQualityNavigated()
+                }
+            })
 
-        sleepTrackerViewModel.navigateToSleepQuality.observe(viewLifecycleOwner, Observer { night ->
+        sleepTrackerViewModel.nights.observe(viewLifecycleOwner) {
+            it?.let {
+                adapter.addHeaderAndSubmitList(it)
+            }
+        }
+
+        sleepTrackerViewModel.navigateToSleepQuality.observe(viewLifecycleOwner) { night ->
             night?.let {
                 this.findNavController().navigate(
                     SleepTrackerFragmentDirections.actionSleepTrackerFragmentToSleepQualityFragment(
@@ -107,9 +127,9 @@ class SleepTrackerFragment : Fragment() {
                 )
                 sleepTrackerViewModel.doneNavigating()
             }
-        })
+        }
 
-        sleepTrackerViewModel.showSnackBarEvent.observe(viewLifecycleOwner, Observer {
+        sleepTrackerViewModel.showSnackBarEvent.observe(viewLifecycleOwner) {
             if (it == true) {
                 Snackbar.make(
                     requireActivity().findViewById(android.R.id.content),
@@ -118,7 +138,7 @@ class SleepTrackerFragment : Fragment() {
                 ).show()
                 sleepTrackerViewModel.doneShowingSnackBar()
             }
-        })
+        }
 
         return binding.root
     }
